@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams} from 'react-router-dom';
-import api from '@/services/api';
+import { useParams } from 'react-router-dom';
+import api, { usersApi } from '@/services/api';
 import AuthModal from '@/components/AuthModal';
 import type { ICourse } from '@/types';
 import Yoga from '@/assets/images/Yoga.jpg';
@@ -45,8 +45,8 @@ export default function CoursePage() {
     Promise.all([api.get(`/courses/${id}`), token ? api.get('/users/me') : Promise.resolve(null)])
       .then(([courseRes, userRes]) => {
         setCourse(courseRes.data);
-        if (userRes?.data?.selectedCourses) {
-          setUserCourses(userRes.data.selectedCourses);
+        if (userRes?.data?.user?.selectedCourses) {
+          setUserCourses(userRes.data.user.selectedCourses);
         }
         setLoading(false);
       })
@@ -66,16 +66,16 @@ export default function CoursePage() {
 
   const handleAddCourseClick = () => {
     const token = localStorage.getItem('token');
-
     if (!token) {
       setIsAuthModalOpen(true);
       return;
     }
 
-    api
-      .post('/users/me/courses', { courseId: id })
+    usersApi
+      .addCourse(id!)
       .then(() => {
         setUserCourses((prev) => [...prev, id!]);
+        window.dispatchEvent(new Event('course-updated'));
       })
       .catch((err: any) => {
         alert(err.response?.data?.message || 'Ошибка при добавлении курса');

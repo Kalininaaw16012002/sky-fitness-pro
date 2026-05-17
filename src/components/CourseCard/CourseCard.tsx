@@ -2,6 +2,7 @@ import Calendar from '@/assets/images/Calendar.svg';
 import Time from '@/assets/images/Time.svg';
 import mingcute from '@/assets/images/mingcute.svg';
 import plus from '@/assets/images/plus.png';
+import minus from '@/assets/images/minus.png';
 
 interface CourseCardProps {
   course: {
@@ -13,12 +14,20 @@ interface CourseCardProps {
     difficulty: string;
   };
   onClick?: () => void;
+  isAdded?: boolean;
+  onToggleCourse?: (e: React.MouseEvent, id: string) => void;
 }
 
-export default function CourseCard({ course, onClick }: CourseCardProps) {
-  const handleAddCourse = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Добавить курс:', course.title);
+export default function CourseCard({
+  course,
+  onClick,
+  isAdded = false,
+  onToggleCourse,
+}: CourseCardProps) {
+  const handleToggleCourse = (e: React.MouseEvent) => {
+    if (onToggleCourse) {
+      onToggleCourse(e, course.id);
+    }
   };
 
   const badgeTextClass =
@@ -37,10 +46,15 @@ export default function CourseCard({ course, onClick }: CourseCardProps) {
         />
 
         <button
-          onClick={handleAddCourse}
+          onClick={handleToggleCourse}
           className="absolute top-[22px] right-[22px] cursor-pointer flex items-center justify-center p-2"
+          title={isAdded ? 'Удалить курс' : 'Добавить курс'}
         >
-          <img src={plus} alt="Добавить" className="w-[24px] h-[24px] object-contain" />
+          <img
+            src={isAdded ? minus : plus}
+            alt={isAdded ? 'Удалить' : 'Добавить'}
+            className="w-[32px] h-[32px] object-contain"
+          />
         </button>
       </div>
 

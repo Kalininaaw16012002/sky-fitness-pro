@@ -42,4 +42,34 @@ export const authApi = {
   },
 };
 
+export const usersApi = {
+  getMe: () => api.get('/users/me'),
+
+  addCourse: async (courseId: string) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/users/me/courses`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ courseId }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Ошибка добавления курса');
+    }
+    return response;
+  },
+
+  removeCourse: (courseId: string) => api.delete(`/users/me/courses/${courseId}`),
+
+  getCourseProgress: (courseId: string) => api.get(`/users/me/progress?courseId=${courseId}`),
+};
+
+export const coursesApi = {
+  getAll: () => api.get('/courses'),
+  getById: (courseId: string) => api.get(`/courses/${courseId}`),
+  getWorkouts: (courseId: string) => api.get(`/courses/${courseId}/workouts`),
+};
+
 export default api;

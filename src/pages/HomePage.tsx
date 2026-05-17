@@ -11,6 +11,7 @@ import Fitness from '@/assets/images/Fitness.jpg';
 import step from '@/assets/images/step.jpg';
 import bodyflex from '@/assets/images/bodyflex.jpg';
 import type { ICourse } from '@/types';
+import { usersApi } from '@/services/api';
 
 const courseImages: Record<string, string> = {
   Йога: Yoga,
@@ -25,17 +26,26 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [userCourseIds, setUserCourseIds] = useState<string[]>([]);
 
   useEffect(() => {
-    api
-      .get('/courses')
-      .then((response) => {
+    const token = localStorage.getItem('token');
+
+    Promise.all([
+      api.get('/courses'),
+      token ? api.get('/users/me').catch(() => null) : Promise.resolve(null),
+    ])
+      .then(([coursesRes, userRes]) => {
         const desiredOrder = ['Йога', 'Стретчинг', 'Фитнес', 'Степ-аэробика', 'Бодифлекс'];
-        const sorted = response.data.sort(
+        const sorted = coursesRes.data.sort(
           (a: ICourse, b: ICourse) =>
             desiredOrder.indexOf(a.nameRU) - desiredOrder.indexOf(b.nameRU),
         );
         setCourses(sorted);
+
+        if (userRes?.data?.user?.selectedCourses) {
+          setUserCourseIds(userRes.data.user.selectedCourses);
+        }
         setLoading(false);
       })
       .catch((err) => {
@@ -45,10 +55,46 @@ export default function HomePage() {
       });
   }, []);
 
+  const handleToggleCourse = (e: React.MouseEvent, courseId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    const isAdded = userCourseIds.includes(courseId);
+
+    if (isAdded) {
+      usersApi
+        .removeCourse(courseId)
+        .then(() => {
+          setUserCourseIds((prev) => prev.filter((id) => id !== courseId));
+          window.dispatchEvent(new Event('auth-change'));
+          window.dispatchEvent(new Event('course-updated'));
+        })
+        .catch((err) => alert(err.response?.data?.message || 'Ошибка удаления'));
+    } else {
+      usersApi
+        .addCourse(courseId)
+        .then(() => {
+          setUserCourseIds((prev) => [...prev, courseId]);
+          window.dispatchEvent(new Event('auth-change'));
+          window.dispatchEvent(new Event('course-updated'));
+        })
+        .catch((err: any) => alert(err.message || 'Ошибка добавления'));
+    }
+  };
   const handleAuthSuccess = (token: string, email: string) => {
     localStorage.setItem('token', token);
     localStorage.setItem('userEmail', email);
     window.dispatchEvent(new Event('auth-change'));
+    api
+      .get('/users/me')
+      .then((res) => setUserCourseIds(res.data.user?.selectedCourses || []))
+      .catch(() => {});
   };
 
   if (loading) return <div className="text-center py-20">Загрузка...</div>;
@@ -74,7 +120,11 @@ export default function HomePage() {
       <section className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[40px] justify-between">
           {courses.map((course) => (
-            <Link to={`/courses/${course._id}`} key={course._id} className="flex justify-center">
+            <Link
+              to={`/courses/${course._id}`}
+              key={course._id}
+              className="flex justify-center relative"
+            >
               <CourseCard
                 course={{
                   id: course._id,
@@ -84,6 +134,8 @@ export default function HomePage() {
                   timePerDay: `${course.dailyDurationInMinutes.from}-${course.dailyDurationInMinutes.to} мин/день`,
                   difficulty: course.difficulty,
                 }}
+                isAdded={userCourseIds.includes(course._id)}
+                onToggleCourse={(e) => handleToggleCourse(e, course._id)}
               />
             </Link>
           ))}

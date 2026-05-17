@@ -3,6 +3,7 @@ import Layout from '@/components/Layout';
 import HomePage from '@/pages/HomePage';
 import CoursePage from '@/pages/CoursePage';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -16,12 +17,8 @@ function App() {
             element={<div className="p-10">Страница тренировки (в разработке)</div>}
           />
 
-          <Route element={<ProtectedRoute />}>
-            <Route
-              path="profile"
-              element={<div className="p-10 font-[Roboto]">Страница профиля (в разработке)</div>}
-            />
-          </Route>
+          <Route element={<ProtectedRoute />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>
