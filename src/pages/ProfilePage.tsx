@@ -13,6 +13,7 @@ import minus from '@/assets/images/minus.png';
 import Calendar from '@/assets/images/Calendar.svg';
 import Time from '@/assets/images/Time.svg';
 import mingcute from '@/assets/images/mingcute.svg';
+import WorkoutSelectionModal from '@/components/WorkoutSelectionModal';
 
 const courseImages: Record<string, string> = {
   Йога: Yoga,
@@ -28,6 +29,8 @@ export default function ProfilePage() {
   const [myCourses, setMyCourses] = useState<ICourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [courseProgress, setCourseProgress] = useState<Record<string, number>>({});
+  const [selectedCourse, setSelectedCourse] = useState<ICourse | null>(null);
+  const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
 
   const loadUserCourses = useCallback(() => {
     const token = localStorage.getItem('token');
@@ -137,6 +140,12 @@ export default function ProfilePage() {
     if (progress === 100) return 'Начать заново';
     return 'Продолжить';
   };
+
+  const handleStartTrainingClick = (course: ICourse) => {
+    setSelectedCourse(course);
+    setIsWorkoutModalOpen(true);
+  };
+
   if (loading) return <div className="text-center py-20">Загрузка...</div>;
 
   return (
@@ -257,12 +266,12 @@ export default function ProfilePage() {
                         ></div>
                       </div>
 
-                      <Link
-                        to={`/courses/${course._id}`}
+                      <button
+                        onClick={() => handleStartTrainingClick(course)}
                         className="block w-full h-[52px] rounded-[46px] bg-[#BCEC30] text-black font-[Roboto] font-normal text-[18px] leading-[110%] tracking-normal [font-variant-numeric:lining-nums_proportional-nums] flex items-center justify-center hover:opacity-90 transition-opacity"
                       >
                         {getButtonText(course._id)}
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -279,6 +288,12 @@ export default function ProfilePage() {
           </button>
         </div>
       </main>
+
+      <WorkoutSelectionModal
+        isOpen={isWorkoutModalOpen}
+        onClose={() => setIsWorkoutModalOpen(false)}
+        course={selectedCourse}
+      />
     </div>
   );
 }
