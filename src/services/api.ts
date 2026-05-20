@@ -64,12 +64,36 @@ export const usersApi = {
   removeCourse: (courseId: string) => api.delete(`/users/me/courses/${courseId}`),
 
   getCourseProgress: (courseId: string) => api.get(`/users/me/progress?courseId=${courseId}`),
+
+  saveWorkoutProgress: (courseId: string, workoutId: string, progressData: number[]) => {
+    const token = localStorage.getItem('token');
+    return fetch(`${API_BASE_URL}/courses/${courseId}/workouts/${workoutId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ progressData }), 
+    }).then(async (res) => {
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Ошибка сохранения');
+      }
+      return res.json();
+    });
+  },
+
+  getWorkoutProgress: (courseId: string, workoutId: string) =>
+    api.get(`/users/me/progress?courseId=${courseId}&workoutId=${workoutId}`),
 };
 
 export const coursesApi = {
   getAll: () => api.get('/courses'),
   getById: (courseId: string) => api.get(`/courses/${courseId}`),
   getWorkouts: (courseId: string) => api.get(`/courses/${courseId}/workouts`),
+};
+
+export const workoutsApi = {
+  getById: (workoutId: string) => api.get(`/workouts/${workoutId}`),
 };
 
 export default api;
