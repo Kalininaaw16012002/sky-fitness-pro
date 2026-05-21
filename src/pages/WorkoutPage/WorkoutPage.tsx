@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams} from 'react-router-dom';
 import { workoutsApi, usersApi, coursesApi } from '@/services/api';
 import Header from '@/components/Header/Header';
+import AuthModal from '@/components/AuthModal/AuthModal'; 
 import type { ICourse, IWorkout, IWorkoutProgress } from '@/types';
 import ProgressInputModal from '@/components/ProgressInputModal/ProgressInputModal';
 import SuccessModal from '@/components/SuccessModal/SuccessModal';
@@ -83,6 +84,13 @@ export default function WorkoutPage() {
     }
 
     setIsProgressModalOpen(true);
+  };
+
+  const handleAuthSuccess = (token: string, email: string) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('userEmail', email);
+    setIsAuthModalOpen(false);
+    window.dispatchEvent(new Event('auth-change'));
   };
 
   const submitProgressToServer = (data: number[]) => {
@@ -208,6 +216,12 @@ export default function WorkoutPage() {
           </div>
         </div>
       </main>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
 
       <ProgressInputModal
         isOpen={isProgressModalOpen}
