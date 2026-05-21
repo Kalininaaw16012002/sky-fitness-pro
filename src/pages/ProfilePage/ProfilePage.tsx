@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usersApi, coursesApi } from '@/services/api';
-import Header from '@/components/Header';
-import type { ICourse } from '@/types';
+import Header from '@/components/Header/Header';
+import type { ICourse, ICourseProgress } from '@/types';
 import Yoga from '@/assets/images/Yoga.jpg';
 import Stretching from '@/assets/images/Stretching.jpg';
 import Fitness from '@/assets/images/Fitness.jpg';
@@ -13,7 +13,7 @@ import minus from '@/assets/images/minus.png';
 import Calendar from '@/assets/images/Calendar.svg';
 import Time from '@/assets/images/Time.svg';
 import mingcute from '@/assets/images/mingcute.svg';
-import WorkoutSelectionModal from '@/components/WorkoutSelectionModal';
+import WorkoutSelectionModal from '@/components/WorkoutSelectionModal/WorkoutSelectionModal';
 
 const courseImages: Record<string, string> = {
   Йога: Yoga,
@@ -74,11 +74,11 @@ export default function ProfilePage() {
             usersApi
               .getCourseProgress(course._id)
               .then((progressRes) => {
-                const data = progressRes.data;
+                const data = progressRes.data as ICourseProgress;
                 let percent = 0;
                 if (data.workoutsProgress && data.workoutsProgress.length > 0) {
                   const completedCount = data.workoutsProgress.filter(
-                    (w: any) => w.workoutCompleted,
+                    (w) => w.workoutCompleted,
                   ).length;
                   const totalWorkouts = course.workouts?.length || 1;
                   percent = Math.round((completedCount / totalWorkouts) * 100);

@@ -52,8 +52,12 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
         setPassword('');
         setConfirmPassword('');
       }
-    } catch (err: any) {
-      setError(err.message || 'Произошла ошибка');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Произошла ошибка');
+      }
     } finally {
       setLoading(false);
     }

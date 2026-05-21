@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api, { usersApi } from '@/services/api';
-import AuthModal from '@/components/AuthModal';
+import AuthModal from '@/components/AuthModal/AuthModal';
 import type { ICourse } from '@/types';
 import Yoga from '@/assets/images/Yoga.jpg';
 import Stretching from '@/assets/images/Stretching.jpg';
@@ -12,7 +12,7 @@ import runner from '@/assets/images/runner.svg';
 import runnermv from '@/assets/images/runnermv.svg';
 import Vector1 from '@/assets/images/Vector1.svg';
 import Vector2 from '@/assets/images/Vector2.svg';
-import Header from '@/components/Header';
+import Header from '@/components/Header/Header';
 
 const courseImages: Record<string, string> = {
   Йога: Yoga,
@@ -77,8 +77,14 @@ export default function CoursePage() {
         setUserCourses((prev) => [...prev, id!]);
         window.dispatchEvent(new Event('course-updated'));
       })
-      .catch((err: any) => {
-        alert(err.response?.data?.message || 'Ошибка при добавлении курса');
+      .catch((err: unknown) => {
+        let message = 'Ошибка при добавлении курса';
+
+        if (err instanceof Error) {
+          message = err.message;
+        }
+
+        alert(message);
       });
   };
 

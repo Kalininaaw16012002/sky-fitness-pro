@@ -1,29 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate} from 'react-router-dom';
+import { useParams} from 'react-router-dom';
 import { workoutsApi, usersApi, coursesApi } from '@/services/api';
-import Header from '@/components/Header';
-import type { ICourse } from '@/types';
-import ProgressInputModal from '@/components/ProgressInputModal'; 
-import SuccessModal from '@/components/SuccessModal';
-
-interface Exercise {
-  _id: string;
-  name: string;
-  quantity: number;
-}
-
-interface Workout {
-  _id: string;
-  name: string;
-  video: string;
-  exercises: Exercise[];
-}
+import Header from '@/components/Header/Header';
+import type { ICourse, IWorkout, IWorkoutProgress } from '@/types';
+import ProgressInputModal from '@/components/ProgressInputModal/ProgressInputModal';
+import SuccessModal from '@/components/SuccessModal/SuccessModal';
 
 export default function WorkoutPage() {
   const { id: workoutId } = useParams();
-  const navigate = useNavigate();
 
-  const [workout, setWorkout] = useState<Workout | null>(null);
+  const [workout, setWorkout] = useState<IWorkout | null>(null);
   const [course, setCourse] = useState<ICourse | null>(null);
   const [progressData, setProgressData] = useState<number[]>([]);
   const [savedProgress, setSavedProgress] = useState<number[]>([]);
@@ -56,17 +42,25 @@ export default function WorkoutPage() {
         setWorkout(workoutRes.data);
         setCourse(courseRes.data);
 
-        const workouts = workoutsListRes.data;
-        const workoutIndex = workouts.findIndex((w: any) => w._id === workoutId);
+        const workouts = workoutsListRes.data as IWorkout[];
+        const workoutIndex = workouts.findIndex((w) => w._id === workoutId);
         const calculatedNumber = workoutIndex >= 0 ? workoutIndex + 1 : 1;
 
         setWorkoutNumber(calculatedNumber);
 
-        if (progressRes?.data?.progressData) {
-          setProgressData(progressRes.data.progressData);
-          setSavedProgress([...progressRes.data.progressData]);
+        if (progressRes?.data) {
+          const workoutProgress = progressRes.data as IWorkoutProgress;
+
+          if (Array.isArray(workoutProgress.progressData)) {
+            setProgressData(workoutProgress.progressData);
+            setSavedProgress([...workoutProgress.progressData]);
+          } else {
+            const initial = new Array((workoutRes.data as IWorkout).exercises?.length || 0).fill(0);
+            setProgressData(initial);
+            setSavedProgress(initial);
+          }
         } else {
-          const initial = new Array(workoutRes.data.exercises?.length || 0).fill(0);
+          const initial = new Array((workoutRes.data as IWorkout).exercises?.length || 0).fill(0);
           setProgressData(initial);
           setSavedProgress(initial);
         }
@@ -78,13 +72,6 @@ export default function WorkoutPage() {
         setLoading(false);
       });
   }, [workoutId]);
-
-  const handleProgressChange = (index: number, value: string) => {
-    const num = parseInt(value) || 0;
-    const newData = [...progressData];
-    newData[index] = num;
-    setProgressData(newData);
-  };
 
   const handleSaveProgress = () => {
     const token = localStorage.getItem('token');
@@ -118,7 +105,7 @@ export default function WorkoutPage() {
 
     const progressData = data.map((val) => {
       const num = typeof val === 'number' ? val : parseInt(val) || 0;
-      return Math.max(0, num); 
+      return Math.max(0, num);
     });
 
     usersApi
@@ -186,7 +173,6 @@ export default function WorkoutPage() {
               const current = progressData[index] || 0;
               const target = exercise.quantity;
               const percent = calculateProgress(current, target);
-              const isSaved = savedProgress[index] === current;
 
               return (
                 <div key={exercise._id} className="flex flex-col">
@@ -217,7 +203,7 @@ export default function WorkoutPage() {
               onClick={handleSaveProgress}
               className="w-[320px] h-[52px] rounded-[46px] bg-[#BCEC30] text-black font-[Roboto] font-normal text-[18px] leading-[110%] hover:opacity-90 transition-opacity flex items-center justify-center"
             >
-               {submitButtonText} 
+              {submitButtonText}
             </button>
           </div>
         </div>

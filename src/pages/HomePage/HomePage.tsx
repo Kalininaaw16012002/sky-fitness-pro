@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CourseCard from '@/components/CourseCard/CourseCard';
-import AuthModal from '@/components/AuthModal';
-import Header from '@/components/Header';
+import AuthModal from '@/components/AuthModal/AuthModal';
+import Header from '@/components/Header/Header';
 import api from '@/services/api';
 import flag from '@/assets/images/flag.svg';
 import Yoga from '@/assets/images/Yoga.jpg';
@@ -84,7 +84,13 @@ export default function HomePage() {
           window.dispatchEvent(new Event('auth-change'));
           window.dispatchEvent(new Event('course-updated'));
         })
-        .catch((err: any) => alert(err.message || 'Ошибка добавления'));
+        .catch((err: unknown) => {
+          let message = 'Ошибка добавления';
+          if (err instanceof Error) {
+            message = err.message;
+          }
+          alert(message);
+        });
     }
   };
   const handleAuthSuccess = (token: string, email: string) => {

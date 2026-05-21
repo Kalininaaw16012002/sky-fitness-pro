@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { coursesApi, usersApi } from '@/services/api';
-import type { ICourse } from '@/types';
+import type { ICourse, ICourseProgress, IWorkout } from '@/types';
 
 interface WorkoutSelectionModalProps {
   isOpen: boolean;
@@ -9,12 +9,6 @@ interface WorkoutSelectionModalProps {
   course: ICourse | null;
 }
 
-interface Workout {
-  _id: string;
-  name: string;
-  video: string;
-  exercises: Array<{ name: string; quantity: number; _id: string }>;
-}
 
 export default function WorkoutSelectionModal({
   isOpen,
@@ -23,7 +17,7 @@ export default function WorkoutSelectionModal({
 }: WorkoutSelectionModalProps) {
   const navigate = useNavigate();
 
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [workouts, setWorkouts] = useState<IWorkout[]>([]);
   const [completedWorkouts, setCompletedWorkouts] = useState<string[]>([]);
   const [selectedWorkoutId, setSelectedWorkoutId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -39,11 +33,12 @@ export default function WorkoutSelectionModal({
       ])
         .then(([workoutsRes, progressRes]) => {
           setWorkouts(workoutsRes.data);
-
+          
+          const progressData = progressRes.data as ICourseProgress;
           const completed =
-            progressRes.data.workoutsProgress
-              ?.filter((w: any) => w.workoutCompleted)
-              .map((w: any) => w.workoutId) || [];
+            progressData.workoutsProgress
+              ?.filter((w) => w.workoutCompleted) 
+              .map((w) => w.workoutId) || [];
 
           setCompletedWorkouts(completed);
         })

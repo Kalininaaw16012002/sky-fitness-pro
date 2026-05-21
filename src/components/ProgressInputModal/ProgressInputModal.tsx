@@ -25,9 +25,11 @@ export default function ProgressInputModal({
 
   useEffect(() => {
     if (isOpen && exercises.length > 0) {
-      const initData = initialData.length === exercises.length 
-        ? [...initialData] 
-        : new Array(exercises.length).fill(0);
+      const initData = new Array(exercises.length).fill(0).map((_, index) => {
+        const val = initialData[index];
+        return typeof val === 'number' ? val : 0;
+      });
+
       setValues(initData);
     }
   }, [isOpen, exercises, initialData]);
@@ -35,9 +37,9 @@ export default function ProgressInputModal({
   if (!isOpen) return null;
 
   const handleChange = (index: number, val: string) => {
-    const num = parseInt(val) || 0;
+    const num = parseInt(val, 10);
     const newValues = [...values];
-    newValues[index] = num;
+    newValues[index] = isNaN(num) ? 0 : num;
     setValues(newValues);
   };
 
@@ -48,7 +50,6 @@ export default function ProgressInputModal({
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-[30px] shadow-xl w-full max-w-[460px] p-6 lg:p-[40px] flex flex-col relative max-h-[90vh] overflow-y-auto">
-        
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl leading-none"
@@ -65,14 +66,14 @@ export default function ProgressInputModal({
             const cleanName = ex.name.split(' (')[0];
             return (
               <div key={ex._id} className="flex flex-col gap-2">
-                <label className="font-[Roboto] font-normal text-[18px] text-gray-700">
-                  Сколько раз вы сделали <span className="font-medium">{cleanName.toLowerCase()}</span>?
+                <label className="font-[Roboto] font-normal text-[18px] text-gray-900">
+                  Сколько раз вы сделали <span>{cleanName.toLowerCase()}</span>?
                 </label>
                 <input
                   type="number"
                   min="0"
-                  max={ex.quantity * 2} 
-                  value={values[index]}
+                  max={ex.quantity * 2}
+                  value={values[index] ?? 0}
                   onChange={(e) => handleChange(index, e.target.value)}
                   className="w-full px-4 py-3 rounded-[12px] border border-gray-200 font-[Roboto] text-[18px] focus:border-[#BCEC30] focus:outline-none focus:ring-2 focus:ring-[#BCEC30]/20"
                   placeholder="0"

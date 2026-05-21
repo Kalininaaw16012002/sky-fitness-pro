@@ -72,7 +72,7 @@ export const usersApi = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ progressData }), 
+      body: JSON.stringify({ progressData }),
     }).then(async (res) => {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -84,6 +84,11 @@ export const usersApi = {
 
   getWorkoutProgress: (courseId: string, workoutId: string) =>
     api.get(`/users/me/progress?courseId=${courseId}&workoutId=${workoutId}`),
+
+  resetCourseProgress: (courseId: string) => api.patch(`/courses/${courseId}/reset`),
+
+  resetWorkoutProgress: (courseId: string, workoutId: string) =>
+    api.patch(`/courses/${courseId}/workouts/${workoutId}/reset`),
 };
 
 export const coursesApi = {
