@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+Sky Fitness Pro
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sky Fitness Pro — это  веб-приложение для домашних онлайн-тренировок. Платформа позволяет пользователям выбирать курсы фитнес-направлений, отслеживать прогресс по упражнениям и управлять своими тренировками в личном кабинете.
 
-Currently, two official plugins are available:
+Возможности:
+- Каталог курсов: просмотр доступных направлений (Йога, Стретчинг, Фитнес и др.) с детальной информацией.
+- Авторизация и регистрация: безопасный вход с валидацией по API.
+- Профиль: управление добавленными курсами, просмотр общего прогресса, выход из аккаунта.
+- Страница тренировки: встроенные видео-уроки, списки упражнений и ввод результатов.
+- Трекер прогресса: сохранение и обновление результатов, визуализация выполнения в процентах.
+- Адаптивный дизайн: корректное отображение на мобильных устройствах.
+- Юнит-тесты: покрытие бизнес-логики и компонентов с помощью Vitest и React Testing Library.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Стек технологий
+| Категория       | Технологии                                                                 |
+|-----------------|----------------------------------------------------------------------------|
+| Фреймворк       | React, TypeScript, Vite                                                    |
+| Стили           | Tailwind CSS, PostCSS, Autoprefixer                                        |
+| Роутинг         | React Router DOM                                                           |
+| HTTP/API        | Axios, Fetch API                                                           |
+| Тестирование    | Vitest, React Testing Library, jsdom                                       |
+| Код-стайл       | ESLint, Prettier, TypeScript (strict mode)                                 |
+| Деплой          | Vercel / Netlify / Cloudflare Pages                                        |
 
-## React Compiler
+Установка и запуск
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Требования:
+- Node.js `>= 18.0.0`
+- npm `>= 9.0.0` (или yarn/pnpm)
 
-## Expanding the ESLint configuration
+Шаги
+1. Клонируйте репозиторий
+   git clone https://github.com/ВАШ_НИК/sky-fitness-pro.git
+   cd sky-fitness-pro
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. Установите зависимости
+   npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+3. Запустите проект в режиме разработки
+   npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Приложение откроется по адресу: http://localhost:5173
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+API:
+Приложение работает с REST API https://wedev-api.sky.pro/api/fitness.
+Все защищённые запросы отправляются с заголовком Authorization: Bearer <token>.
+Подробная документация эндпоинтов доступна в техническом задании проекта.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Тестирование:
+Проект покрыт юнит-тестами, которые проверяют:
+- Корректность расчёта прогресса по упражнениям
+- Рендеринг и взаимодействие компонентов (CourseCard)
+- Структуру и доступность методов API
+Для запуска тестов используйте: npm run test:run
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Деплой:
+Проект готов к развёртыванию на статическом хостинге:
+Netlify: перетащите папку dist в дашборд или подключите Git-репозиторий.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+
+Разработано в рамках учебного проекта Калининой А.В.

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { workoutsApi, usersApi, coursesApi } from '@/services/api';
 import Header from '@/components/Header/Header';
-import AuthModal from '@/components/AuthModal/AuthModal'; 
+import AuthModal from '@/components/AuthModal/AuthModal';
 import type { ICourse, IWorkout, IWorkoutProgress } from '@/types';
 import ProgressInputModal from '@/components/ProgressInputModal/ProgressInputModal';
 import SuccessModal from '@/components/SuccessModal/SuccessModal';
+import { calculateProgress } from '@/utils/calculateProgress';
 
 export default function WorkoutPage() {
   const { id: workoutId } = useParams();
@@ -132,11 +133,6 @@ export default function WorkoutPage() {
         alert(message);
         setIsProgressModalOpen(false);
       });
-  };
-
-  const calculateProgress = (current: number, target: number) => {
-    if (target === 0) return 0;
-    return Math.min(100, Math.round((current / target) * 100));
   };
 
   if (loading) return <div className="text-center py-20">Загрузка...</div>;
