@@ -30,7 +30,7 @@ Sky Fitness Pro — это  веб-приложение для домашних 
 
 Шаги
 1. Клонируйте репозиторий
-   git clone https://github.com/ВАШ_НИК/sky-fitness-pro.git
+   git clone https://github.com/Kalininaaw16012002/sky-fitness-pro.git
    cd sky-fitness-pro
 
 2. Установите зависимости
